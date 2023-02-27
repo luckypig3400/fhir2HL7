@@ -3,9 +3,27 @@ const path = require('path');
 
 // Function to convert FHIR patient to HL7 message
 function fhirToHl7(patient) {
-  const mshSegment = `MSH|^~\\&|${patient.meta.source}|${patient.meta.versionId}|${patient.meta.lastUpdated}|${patient.meta.profile[0]}|${patient.meta.security[0].code}|${patient.meta.tag[0].code}||ADT^A01|${patient.id}|P|2.3|||NE|AL|USA\r`;
+  const source = patient.meta?.source ?? '';
+  const versionId = patient.meta?.versionId ?? '';
+  const lastUpdated = patient.meta?.lastUpdated ?? '';
+  const profile = patient.meta?.profile?.[0] ?? '';
+  const securityCode = patient.meta?.security?.[0]?.code ?? '';
+  const tagCode = patient.meta?.tag?.[0]?.code ?? '';
+  const id = patient.id ?? '';
+  const system = patient.identifier?.[0]?.system ?? '';
+  const familyName = patient.name?.[0]?.family?.[0] ?? '';
+  const givenName = patient.name?.[0]?.given?.[0] ?? '';
+  const middleName = patient.name?.[0]?.middle?.[0] ?? '';
+  const gender = patient.gender ?? '';
+  const birthDate = patient.birthDate ?? '';
+  const addressLine = patient.address?.[0]?.line?.[0] ?? '';
+  const city = patient.address?.[0]?.city ?? '';
+  const state = patient.address?.[0]?.state ?? '';
+  const postalCode = patient.address?.[0]?.postalCode ?? '';
+  const countryCode = patient.address?.[0]?.countryCode ?? '';
 
-  const pidSegment = `PID|||${patient.id}^^^${patient.identifier[0].system}|${patient.name[0].family[0]}^${patient.name[0].given[0]}^${patient.name[0].middle[0]}||${patient.gender}|${patient.birthDate}|${patient.address[0].line[0]}^^${patient.address[0].city}^${patient.address[0].state}^${patient.address[0].postalCode}^${patient.address[0].countryCode}||||||||||||||||||\r`;
+  const mshSegment = `MSH|^~\\&|${source}|${versionId}|${lastUpdated}|${profile}|${securityCode}|${tagCode}||ADT^A01|${id}|P|2.3|||NE|AL|USA\r`;
+  const pidSegment = `PID|||${id}^^^${system}|${familyName}^${givenName}^${middleName}||${gender}|${birthDate}|${addressLine}^^${city}^${state}^${postalCode}^${countryCode}||||||||||||||||||\r`;
 
   return mshSegment + pidSegment;
 }
@@ -13,7 +31,14 @@ function fhirToHl7(patient) {
 // Function to read a file and convert its contents to HL7 format
 function convertFile(filePath) {
   const data = fs.readFileSync(filePath);
-  const patient = JSON.parse(data);
+  let patient;
+  try {
+    patient = JSON.parse(data);
+  } catch (err) {
+    console.error(`Error parsing JSON file: ${filePath}`);
+    console.error(err);
+    return;
+  }
   const hl7 = fhirToHl7(patient);
   const fileName = path.basename(filePath, '.json') + '.hl7';
   const outputFilePath = path.join('convertResults', fileName);
