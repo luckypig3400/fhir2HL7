@@ -23,8 +23,8 @@ function fhirToHl7(patient) {
     const postalCode = patient.address?.[0]?.postalCode ?? '';
     const countryCode = patient.address?.[0]?.countryCode ?? '';
 
-    const mshSegment = `MSH|^~\\&|${source}|${versionId}|${lastUpdated}|${profile}|${securityCode}|${tagCode}||ADT^A01|${id}|P|2.3|||NE|AL|USA\r`;
-    const pidSegment = `PID|||${id}^^^${system}|${familyName}^${givenName}^${middleName}||${gender}|${birthDate}|${addressLine}^^${city}^${state}^${postalCode}^${countryCode}||||||||||||||||||\r`;
+    const mshSegment = `MSH|^~\\&|${source}|${versionId}|${lastUpdated}|||${profile}|${securityCode}|${tagCode}|ADT^A01|${id}|P|2.5.1|||NE|AL|USA|ASCII|2.5.1\r`;
+    const pidSegment = `PID|||${id}^^^${system}||${familyName}^${givenName}^${middleName}||${birthDate}|${gender}|||${addressLine}^^${city}^${state}^${postalCode}^${countryCode}|||||||||||||||||\r`;
 
     return mshSegment + pidSegment;
   } catch (error) {
