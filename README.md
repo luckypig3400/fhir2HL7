@@ -4,4 +4,7 @@
 ## HL7 Message Validator
 + https://freeonlineformatter.com/hl7-validator/run
 
+## HL7 Message Examples
++ https://www.hl7inspector.com/#
+
 ## Conversation(prompts) history with ChapGPT
