@@ -4,18 +4,18 @@ const path = require('path');
 // Function to convert FHIR patient to HL7 message
 function fhirToHl7(patient) {
   try {
-    const source = patient.meta?.source ?? '';
-    const versionId = patient.meta?.versionId ?? '';
-    const lastUpdated = patient.meta?.lastUpdated ?? '';
-    const profile = patient.meta?.profile?.[0] ?? '';
-    const securityCode = patient.meta?.security?.[0]?.code ?? '';
-    const tagCode = patient.meta?.tag?.[0]?.code ?? '';
-    const id = patient.id ?? '';
-    const system = patient.identifier?.[0]?.system ?? '';
-    const familyName = patient.name?.[0]?.family?.[0] ?? '';
-    const givenName = patient.name?.[0]?.given?.[0] ?? '';
+    const source = patient.meta?.source ?? 'UNKNOWN';
+    const versionId = patient.meta?.versionId ?? '1';
+    const lastUpdated = patient.meta?.lastUpdated ?? new Date().toISOString();
+    const profile = patient.meta?.profile?.[0] ?? 'DEFAULT';
+    const securityCode = patient.meta?.security?.[0]?.code ?? 'DEFAULT';
+    const tagCode = patient.meta?.tag?.[0]?.code ?? 'DEFAULT';
+    const id = patient.id ?? 'UNKNOWN';
+    const system = patient.identifier?.[0]?.system ?? 'UNKNOWN';
+    const familyName = patient.name?.[0]?.family?.[0] ?? 'UNKNOWN';
+    const givenName = patient.name?.[0]?.given?.[0] ?? 'UNKNOWN';
     const middleName = patient.name?.[0]?.middle?.[0] ?? '';
-    const gender = patient.gender ?? '';
+    const gender = patient.gender ?? 'U';
     const birthDate = patient.birthDate ?? '';
     const addressLine = patient.address?.[0]?.line?.[0] ?? '';
     const city = patient.address?.[0]?.city ?? '';
