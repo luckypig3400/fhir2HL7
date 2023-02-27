@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const convertResultsDir = 'convertResults';
+
 // Function to convert FHIR patient to HL7 message
 function fhirToHl7(patient) {
   try {
@@ -23,7 +25,7 @@ function fhirToHl7(patient) {
     const postalCode = patient.address?.[0]?.postalCode ?? '';
     const countryCode = patient.address?.[0]?.countryCode ?? '';
 
-    const mshSegment = `MSH|^~\\&|${source}|${versionId}|${lastUpdated}|||${profile}|${securityCode}|${tagCode}|ADT^A01|${id}|P|2.5.1|||NE|AL|USA|ASCII|2.5.1\r`;
+    const mshSegment = `MSH|^~\\&|${source}|${versionId}|${lastUpdated}|||DEFAULT|DEFAULT|DEFAULT|ADT^A01|${patient.id}|P|2.5.1|||NE|AL|USA|ASCII|2.5.1\r`;
     const pidSegment = `PID|||${id}^^^${system}||${familyName}^${givenName}^${middleName}||${birthDate}|${gender}|||${addressLine}^^${city}^${state}^${postalCode}^${countryCode}|||||||||||||||||\r`;
 
     return mshSegment + pidSegment;
@@ -46,13 +48,28 @@ function convertFile(filePath) {
   }
   const hl7 = fhirToHl7(patient);
   const fileName = path.basename(filePath, '.json') + '.hl7';
-  const outputFilePath = path.join('convertResults', fileName);
+  const outputFilePath = path.join(convertResultsDir, fileName);
+  try {
+    fs.mkdirSync(convertResultsDir, { recursive: true });
+  } catch (err) {
+    console.error(`Error creating directory: ${convertResultsDir}`);
+    console.error(err);
+    return;
+  }
   fs.writeFileSync(outputFilePath, hl7);
 }
 
-// Read all the files in the toBeConvert folder and convert them
-const files = fs.readdirSync('toBeConvert');
-for (const file of files) {
-  const filePath = path.join('toBeConvert', file);
-  convertFile(filePath);
+// Function to watch the toBeConvert folder for changes
+function watchFolder(folderPath) {
+  console.log(`Watching folder for changes: ${folderPath}`);
+  fs.watch(folderPath, (eventType, filename) => {
+    if (filename) {
+      console.log(`Detected change in file: ${filename}`);
+      const filePath = path.join(folderPath, filename);
+      convertFile(filePath);
+    }
+  });
 }
+
+// Watch the toBeConvert folder for changes
+watchFolder('toBeConvert');
