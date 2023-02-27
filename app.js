@@ -3,29 +3,34 @@ const path = require('path');
 
 // Function to convert FHIR patient to HL7 message
 function fhirToHl7(patient) {
-  const source = patient.meta?.source ?? '';
-  const versionId = patient.meta?.versionId ?? '';
-  const lastUpdated = patient.meta?.lastUpdated ?? '';
-  const profile = patient.meta?.profile?.[0] ?? '';
-  const securityCode = patient.meta?.security?.[0]?.code ?? '';
-  const tagCode = patient.meta?.tag?.[0]?.code ?? '';
-  const id = patient.id ?? '';
-  const system = patient.identifier?.[0]?.system ?? '';
-  const familyName = patient.name?.[0]?.family?.[0] ?? '';
-  const givenName = patient.name?.[0]?.given?.[0] ?? '';
-  const middleName = patient.name?.[0]?.middle?.[0] ?? '';
-  const gender = patient.gender ?? '';
-  const birthDate = patient.birthDate ?? '';
-  const addressLine = patient.address?.[0]?.line?.[0] ?? '';
-  const city = patient.address?.[0]?.city ?? '';
-  const state = patient.address?.[0]?.state ?? '';
-  const postalCode = patient.address?.[0]?.postalCode ?? '';
-  const countryCode = patient.address?.[0]?.countryCode ?? '';
+  try {
+    const source = patient.meta?.source ?? '';
+    const versionId = patient.meta?.versionId ?? '';
+    const lastUpdated = patient.meta?.lastUpdated ?? '';
+    const profile = patient.meta?.profile?.[0] ?? '';
+    const securityCode = patient.meta?.security?.[0]?.code ?? '';
+    const tagCode = patient.meta?.tag?.[0]?.code ?? '';
+    const id = patient.id ?? '';
+    const system = patient.identifier?.[0]?.system ?? '';
+    const familyName = patient.name?.[0]?.family?.[0] ?? '';
+    const givenName = patient.name?.[0]?.given?.[0] ?? '';
+    const middleName = patient.name?.[0]?.middle?.[0] ?? '';
+    const gender = patient.gender ?? '';
+    const birthDate = patient.birthDate ?? '';
+    const addressLine = patient.address?.[0]?.line?.[0] ?? '';
+    const city = patient.address?.[0]?.city ?? '';
+    const state = patient.address?.[0]?.state ?? '';
+    const postalCode = patient.address?.[0]?.postalCode ?? '';
+    const countryCode = patient.address?.[0]?.countryCode ?? '';
 
-  const mshSegment = `MSH|^~\\&|${source}|${versionId}|${lastUpdated}|${profile}|${securityCode}|${tagCode}||ADT^A01|${id}|P|2.3|||NE|AL|USA\r`;
-  const pidSegment = `PID|||${id}^^^${system}|${familyName}^${givenName}^${middleName}||${gender}|${birthDate}|${addressLine}^^${city}^${state}^${postalCode}^${countryCode}||||||||||||||||||\r`;
+    const mshSegment = `MSH|^~\\&|${source}|${versionId}|${lastUpdated}|${profile}|${securityCode}|${tagCode}||ADT^A01|${id}|P|2.3|||NE|AL|USA\r`;
+    const pidSegment = `PID|||${id}^^^${system}|${familyName}^${givenName}^${middleName}||${gender}|${birthDate}|${addressLine}^^${city}^${state}^${postalCode}^${countryCode}||||||||||||||||||\r`;
 
-  return mshSegment + pidSegment;
+    return mshSegment + pidSegment;
+  } catch (error) {
+    console.error(`Error converting FHIR to HL7 message: ${error}`);
+    return '';
+  }
 }
 
 // Function to read a file and convert its contents to HL7 format
